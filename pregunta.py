@@ -9,13 +9,30 @@ espacio entre palabra y palabra.
 
 
 """
+import re
 import pandas as pd
 
 
 def ingest_data():
+    with open('clusters_report.txt') as doc:
+        reporte = doc.readlines()
+    agrups=[]
+    agrup1=[0,0,0,'']
+    for row in reporte[4:]:
+        if re.match('^ +[0-9]+ +', row):
+            lista=row.split()
+            agrup1=[int(lista[0]),int(lista[1]),float(lista[2].replace(',','.')),' '.join(lista[4:])]
 
-    #
-    # Inserte su código aquí
-    #
+        elif re.match('^ +[a-z]',row):
+            palabras=' '.join(row.split())
+            agrup1[3]+=' '+palabras
 
+        elif re.match('^\n|^\s*$',row):
+            agrup1[3]=agrup1[3].replace('.','')
+            
+            agrups.append(agrup1)
+            agrup1=[0,0,0,'']
+
+    df=pd.DataFrame(agrups,columns=['cluster','cantidad_de_palabras_clave','porcentaje_de_palabras_clave','principales_palabras_clave'])
+    
     return df
